@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.ft.javabase</groupId>
+    <artifactId>javaBase</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>RELEASE</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <!--<finalName>${project.artifactId}-${project.version}</finalName>-->
+        <!-- resources设置的路径下的文件会被打包到jar包 -->
+        <resources>
+            <!-- 若没有设置resource.directory则打包classpath(resources)下的文件，若设置了directory则把所有权给你了，需指定所有要打包的文件，否则不会默认打包classpath下的文件 -->
+            <resource>
+                <!-- 当前路径是相对于classpath位置，不设置include则默认递归打包该目录下所有文件 -->
+                <directory>./</directory>
+                <includes>
+                    <include>*.xml</include>
+                    <include>*.txt</include>
+                </includes>
+                <!-- 将文件编译时拷贝到指定的目录 -->
+                <targetPath>${project.build.directory}</targetPath>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <targetPath>${project.build.directory}</targetPath>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+                <excludes>
+                    <exclude>*/*.java</exclude>
+                </excludes>
+            </resource>
+        </resources>
+
+        <plugins>
+
+            <!-- 拷贝依赖的jar包到指定目录 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- 配置时间戳，时间格式通过timestampFormat配置，使用时为 ${timestamp} -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>1.4</version>
+                <configuration>
+                    <timestampFormat>yyyyMMdd-HHmmss</timestampFormat>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>create-timestamp</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <inherited>false</inherited>
+            </plugin>
+
+            <!-- 将依赖的jar包里的文件打包进一个jar文件 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                    <archive>
+                        <manifest>
+                            <!-- 在jar包的MF文件中生成Class-Path属性 -->
+                            <addClasspath>true</addClasspath>
+                            <!-- Class-Path 前缀 -->
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <!--<mainClass>com.maven.my.Demo</mainClass>-->
+                        </manifest>
+                        <manifestEntries>
+                            <Class-Path>.</Class-Path>
+                        </manifestEntries>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- 打包jar -->
+            <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-jar-plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    <!-- 指定打包的jar包输出路径-->
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                    <archive>
+                        <!--<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>-->
+                        <manifest>
+                            <!-- 在jar包的MF文件中生成Class-Path属性 -->
+                            <addClasspath>true</addClasspath>
+                            <!-- Class-Path 前缀 -->
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <!-- main全限定包名 -->
+                            <!--<mainClass>com.maven.my.Demo</mainClass>-->
+                        </manifest>
+                        <manifestEntries>
+                            <Name>${project.artifactId}</Name>
+                            <Main-Version>${project.version}</Main-Version>
+                            <Timestamp>${timestamp}</Timestamp>
+                            <Class-Path>.</Class-Path>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
