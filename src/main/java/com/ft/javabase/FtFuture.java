@@ -8,12 +8,21 @@ interface FtCallBack<T, V> {
 
 public class FtFuture {
     public void futureByFutureTask(long millis, boolean block, FtCallBack<Boolean, Integer> callback, boolean threadMod) {
-        FutureTask<Integer> ft = new FutureTask<>(new Callable() {
-            @Override
-            public Integer call() throws Exception {
+//        FutureTask<Integer> ft = new FutureTask<>(new Callable<Integer>() {
+//            @Override
+//            public Integer call() throws Exception {
+//                Thread.sleep(millis);
+//                return 5;
+//            }
+//        });
+        FutureTask<Integer> ft = new FutureTask<>(()->{
+            int retValue = 0;
+            try {
                 Thread.sleep(millis);
-                return 5;
+                retValue = 5;
+            }catch (Exception e) {
             }
+           return retValue;
         });
 
         if (threadMod) {
