@@ -53,7 +53,17 @@ public class TestFtFuture {
     }
 
     public void testByFutureTask(boolean threadMod) {
-        FtCallBackImpl fcbi = new FtCallBackImpl();
+        //FtCallBackImpl fcbi = new FtCallBackImpl();
+        FtCallBack<Boolean, Integer> fcbi = (Future<Integer> ft)->{
+            Boolean done = ft.isDone();
+            if (!done) {
+                System.out.println("callback is not done");
+            } else {
+                System.out.println("========= callback is done");
+            }
+            return done;
+        };
+
         long waitMills = 1000;
         String methodName = "futureByFutureTask";
         testFutureTask(methodName, waitMills, false, null, threadMod);
@@ -77,7 +87,17 @@ public class TestFtFuture {
 
     @Test
     public void testByFuture() {
-        FtCallBackImpl fcbi = new FtCallBackImpl();
+        //FtCallBackImpl fcbi = new FtCallBackImpl();
+        FtCallBack<Boolean, Integer> fcbi = (Future<Integer> ft)->{
+            Boolean done = ft.isDone();
+            if (!done) {
+                System.out.println("callback is not done");
+            } else {
+                System.out.println("========= callback is done");
+            }
+            return done;
+        };
+
         long waitMills = 1000;
         String methodName = "futureByFuture";
         testFuture(methodName, waitMills, false, null);
